@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>100张卡片</title>
+        <link href="https://cdn.bootcss.com/element-ui/1.4.2/theme-default/index.css" rel="stylesheet">
+        <script src="https://cdn.bootcss.com/paho-mqtt/1.0.2/mqttws31.min.js"></script>
+        <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+        <script src="https://cdn.bootcss.com/element-ui/1.4.2/index.js"></script>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <style>
+            .box-card{
+                width:19%;
+                min-width: 200px;
+                height:180px;
+                display: inline-block;
+                margin:4px;
+                padding: 0;
+            }
+        </style>
+        <div id="app">
+            <el-card class="box-card" v-for="i in cards" :body-style="{ padding: '0px' }">
+                <div>
+                    <span style="color:lightblue">#{{i.title}}</span>
+                    <a v-if="i.editing" style="height:16px;width:46px;display:inline-block;float:right" @click="save(i)">[保存]</a>
+
+                    <div v-if="i.editing" style="padding:1px">
+                        <el-input  type="textarea" :rows="6" v-model="i.content" style="font-size: 16px;"></el-input>
+                    </div>
+
+
+                    <div style="padding: 5px">
+                        <div v-if="!i.editing" @dblclick="edit(i)" >{{i.content}}</div>
+                    </div>
+
+                </div>
+            </el-card>
+        </div>
+    <script>
+        var clientId = "" + new Date().getTime() +'_' + Math.random();
+        client = new Paho.MQTT.Client("message.51jinkela.com", Number(8084), clientId);
+        client.onConnectionLost = onConnectionLost;
+        client.onMessageArrived = onMessageArrived;
+        client.connect({
+            onSuccess:onConnect,
+            useSSL:true,
+        });
+
+        function onConnect() {
+            client.subscribe('client')
+            message = new Paho.MQTT.Message("ping");
+            message.destinationName = 'client';
+            client.send(message);
+            console.log("onConnect");
+        }
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:"+responseObject.errorMessage);
+            }
+        }
+
+        function onMessageArrived(message) {
+            console.log("onMessageArrived:"+message.payloadString);
+        }
+
+        var vm=new Vue({
+            el:'#app',
+            data:{
+                cards:[],
+                currenttext:''
+            },
+            mounted: function(){
+                var self=this
+                for(var i=0;i<100;i++){
+                    var c = {
+                        title: ''+i,
+                        content: ''+i+i+i,
+                        editing:false,
+                    }
+                    self.cards.push(c)
+                }
+            },
+            methods: {
+                edit:function(i){
+                    console.log(i)
+                    i.editing = true
+                },
+                save:function(i){
+                    i.editing = false
+                }
+            },
+
+        })
+    </script>
+    </body>
+</html>

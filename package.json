@@ -1,0 +1,22 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "nothing here",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xcstream/blog.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xcstream/blog/issues"
+  },
+  "homepage": "https://github.com/xcstream/blog#readme",
+  "dependencies": {
+    "mqtt": "^2.12.0"
+  }
+}
